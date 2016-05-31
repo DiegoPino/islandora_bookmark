@@ -75,21 +75,28 @@ class BookmarkSession extends Bookmark {
    *   grab the global "$user" variable.
    * @param string $desc
    *   An optional description of the bookmark list.
+   * @param boolean $force
+   *   Force a list to be stored on session
    *
    * @return BookmarkDatabase
    *   A new Bookmark object.
    */
-  public static function createNewList($name, $owner = NULL, $desc = '') {
+  public static function createNewList($name, $owner = NULL, $desc = '', $force = FALSE) {
     if ($owner === NULL) {
       global $user;
       $owner = $user;
     }
-
     $list_id = static::getKey($name);
-
-    $_SESSION['islandora_bookmark'][$list_id] = new static($name, $desc);
-
-    return static::getList($list_id);
+    $newlist = new static($name, $desc);
+    if (!$newlist->getIsDeletable() && !$force) {
+       // If this is the default list, don't create a Session jet
+       user_cookie_save(array('islandora_bookmark_default' => $list_id));
+       return $newlist;
+    }
+    else {
+       $_SESSION['islandora_bookmark'][$list_id] = $newlist;
+       return static::getList($list_id);
+    }
   }
 
   /**
@@ -97,6 +104,9 @@ class BookmarkSession extends Bookmark {
    */
   public function delete() {
     unset($_SESSION['islandora_bookmark'][$this->bookmarkId]);
+    if (count($_SESSION['islandora_bookmark']) == 0) {
+       unset($_SESSION['islandora_bookmark']);
+    }
   }
 
   /**

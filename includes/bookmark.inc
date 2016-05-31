@@ -419,6 +419,8 @@ abstract class Bookmark implements BookmarkInterface {
         );
         drupal_add_html_head($citation_export_head, 'citation_exporter_head');
       }
+      //Needed here, citation adds an empty _SESSION key by default
+      unset($_SESSION[CITATION_EXPORTER_INDEX_SESSION]);
     }
 
     $form = array(

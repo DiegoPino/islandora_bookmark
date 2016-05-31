@@ -121,6 +121,13 @@ function islandora_bookmark_access($list_id) {
   global $user;
 
   $bookmark_object = Bookmark::getList($list_id);
+  
+  // Special case, anonymous user trying to access it's non existing/fake default list
+  if (($bookmark_object === NULL) && (user_is_anonymous()) && isset($_COOKIE['Drupal_visitor_islandora_bookmark_default'])){
+     if (($list_id === $_COOKIE['Drupal_visitor_islandora_bookmark_default']) && (!isset($_SESSION) || !isset($_SESSION['islandora_bookmark']) || empty($_SESSION['islandora_bookmark']))) {
+        $bookmark_object = BookmarkDefaultSessionList::createNewList(t('My Default List'), $user, 'Default bookmark', TRUE);
+    }
+  }
   // We explicitly check anonymous (uid 0) as bookmarks shared with that user
   // are determined to be accessible to everyone.
   return $bookmark_object && ($bookmark_object->bookmarkOwner === $user->uid || in_array($user->uid, $bookmark_object->getUsers()) || in_array('0', $bookmark_object->getUsers()));
@@ -662,7 +669,7 @@ function islandora_bookmark_detailed_form_manage(array $form, array &$form_state
   $bookmark = Bookmark::getList($list_id);
 
   // Manage.
-  if ($bookmark->bookmarkOwner === $user->uid) {
+  if ($bookmark->bookmarkOwner === $user->uid && $bookmark->getIsDeletable()) {
     // Management.
     $form['bookmarks']['management'] = array(
       '#type' => 'fieldset',
@@ -760,7 +767,8 @@ function islandora_bookmark_fedora_repository_object_form(array $form, array &$f
     $form['islandora_bookmark']['lists'] = array(
       '#type' => 'item',
       '#prefix' => '<h3>' . t('Bookmarked in') . ':</h3>',
-      '#markup' => theme('item_list', array('items' => $links)),
+      '#items' => $links,
+      '#theme' => 'item_list',
     );
   }
 
@@ -1106,7 +1114,12 @@ function islandora_bookmark_add_pid(array $form, array &$form_state) {
     $object = islandora_object_load($pid);
 
     $bookmark_object = islandora_bookmark_get_bookmark_by_number($key);
-
+    //Now deal with the special use case of anonymouse
+    if (($bookmark_object === FALSE) && (user_is_anonymous())) {
+      // We are adding a PID to a list that is not in $_SESSION
+       $bookmark_object = BookmarkDefaultSessionList::createNewList(t('My Default List'), NULL, 'Default bookmark');
+    } 
+    
     try {
       $bookmark_object->addPids(array($pid));
       drupal_set_message(t('The object @label has been bookmarked in @listname.',

@@ -38,13 +38,19 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
 
   // User is anon, use session as well.
   if ($user->uid == 0) {
-    if (!isset($_SESSION) || empty($_SESSION['islandora_bookmark']) && variable_get('islandora_bookmark_create_user_default_lists', FALSE)) {
+    if (!isset($_SESSION) || !isset($_SESSION['islandora_bookmark']) || empty($_SESSION['islandora_bookmark']) && variable_get('islandora_bookmark_create_user_default_lists', FALSE)) {
       $bookmark_list[] = BookmarkDefaultSessionList::createNewList(t('My Default List'), $user, 'Default bookmark');
     }
 
     if (!empty($_SESSION['islandora_bookmark'])) {
       foreach (array_keys($_SESSION['islandora_bookmark']) as $id) {
         $bookmark_list[] = BookmarkSession::getList($id);
+      }
+      if (count($_SESSION['islandora_bookmark']) == 1) {
+         $list = reset($_SESSION['islandora_bookmark']);
+         if ($list->getPidCount() == 0) {
+           unset($_SESSION['islandora_bookmark']);
+         }
       }
     }
   }
@@ -116,12 +122,8 @@ function islandora_bookmark_get_bookmark_by_number($listid) {
  */
 function islandora_bookmark_get_bookmarks_visible_to_user($pid, $uid) {
   $lists = array();
-  // SESSION FIRST.
   if ($uid == 0) {
-    if (!isset($_SESSION) || empty($_SESSION['islandora_bookmark']) && variable_get('islandora_bookmark_create_user_default_lists', FALSE)) {
-      BookmarkDefaultSessionList::createNewList(t('My Default List'), NULL, 'Default bookmark');
-    }
-    if (isset($_SESSION['islandora_bookmark'])) {
+   if (isset($_SESSION['islandora_bookmark'])) {
       foreach ($_SESSION['islandora_bookmark'] as $value) {
         $templist = $value;
         if (in_array($pid, $templist->getPids())) {

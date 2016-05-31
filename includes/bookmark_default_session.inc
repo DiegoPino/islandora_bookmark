@@ -12,7 +12,7 @@
  */
 class BookmarkDefaultSessionList extends BookmarkSession {
   /**
-   * Constructor for the BookmarkDefaultDatabaseList object.
+   * Constructor for the BookmarkDefaultSessionList object.
    */
   public function __construct($list_id) {
     parent::__construct($list_id);
@@ -24,5 +24,13 @@ class BookmarkDefaultSessionList extends BookmarkSession {
    */
   public function delete() {
 
+  }
+  
+  public function addPid($pid) {
+    //Only set the $_SESSION keys when first $pid is added
+    if (!isset($_SESSION['islandora_bookmark'][$this->bookmarkId])) {
+      $_SESSION['islandora_bookmark'][$this->bookmarkId] = $this;
+    }
+    $this->pidList[] = $pid;
   }
 }
