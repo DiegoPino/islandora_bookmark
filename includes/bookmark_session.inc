@@ -6,8 +6,10 @@
  */
 
 /**
- * Class that defines a Bookmark object. A Bookmark object needs only to be
- * constructed such that it contains a listname and listid for uniqueness.
+ * Class that defines a Bookmark object.
+ *
+ * A Bookmark object needs only to be constructed such that it
+ * contains a listname and listid for uniqueness.
  */
 class BookmarkSession extends Bookmark {
   /**
@@ -75,8 +77,8 @@ class BookmarkSession extends Bookmark {
    *   grab the global "$user" variable.
    * @param string $desc
    *   An optional description of the bookmark list.
-   * @param boolean $force
-   *   Force a list to be stored on session
+   * @param bool $force
+   *   Force a list to be stored on session.
    *
    * @return BookmarkDatabase
    *   A new Bookmark object.
@@ -89,13 +91,13 @@ class BookmarkSession extends Bookmark {
     $list_id = static::getKey($name);
     $newlist = new static($name, $desc);
     if (!$newlist->getIsDeletable() && !$force) {
-       // If this is the default list, don't create a Session jet
-       user_cookie_save(array('islandora_bookmark_default' => $list_id));
-       return $newlist;
+      // If this is the default list, don't create a Session jet.
+      user_cookie_save(array('islandora_bookmark_default' => $list_id));
+      return $newlist;
     }
     else {
-       $_SESSION['islandora_bookmark'][$list_id] = $newlist;
-       return static::getList($list_id);
+      $_SESSION['islandora_bookmark'][$list_id] = $newlist;
+      return static::getList($list_id);
     }
   }
 
@@ -105,7 +107,7 @@ class BookmarkSession extends Bookmark {
   public function delete() {
     unset($_SESSION['islandora_bookmark'][$this->bookmarkId]);
     if (count($_SESSION['islandora_bookmark']) == 0) {
-       unset($_SESSION['islandora_bookmark']);
+      unset($_SESSION['islandora_bookmark']);
     }
   }
 
@@ -145,4 +147,5 @@ class BookmarkSession extends Bookmark {
   public function addPid($pid) {
     $this->pidList[] = $pid;
   }
+
 }
