@@ -23,7 +23,6 @@ interface BookmarkInterface {
    *
    * @param int $offset
    *   The starting offset of pids to retrieve.
-   *
    * @param int $limit
    *   The number of pids to retrieve.
    *
@@ -71,11 +70,14 @@ interface BookmarkInterface {
    * should fail.
    */
   public function delete();
+
 }
 
 /**
- * Class that defines a Bookmark object. A Bookmark object needs only to be
- * constructed such that it contains a listname and listid for uniqueness.
+ * Class that defines a Bookmark object.
+ *
+ * A Bookmark object needs only to be constructed such that it
+ * contains a listname and listid for uniqueness.
  */
 abstract class Bookmark implements BookmarkInterface {
 
@@ -170,7 +172,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @param bool $force_session_attempt
    *   Force examination of the session, to handle the hook_user_login() stuff.
    *
-   * @return Bookmark|NULL
+   * @return Bookmark|null
    *   Returns either an instantiated Bookmark object if the list exists, or
    *   NULL if we could not get it.
    */
@@ -211,7 +213,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @param array $pids
    *   An array of pids.
    */
-  public function removePids($pids) {
+  public function removePids(array $pids) {
     foreach ($pids as $pid) {
       $this->removePid($pid);
     }
@@ -236,7 +238,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @param array $users
    *   An array of integers, each representing a user ID.
    */
-  public function removeUsers($users) {
+  public function removeUsers(array $users) {
     foreach ($users as $user) {
       $this->removeUser($user);
     }
@@ -251,7 +253,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @param array $pids
    *   An array of strings, representing object PIDs.
    */
-  public function addPids($pids) {
+  public function addPids(array $pids) {
     foreach ($pids as $pid) {
       $this->addPid($pid);
     }
@@ -266,7 +268,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @param array $users
    *   An array of integers, representings user IDs.
    */
-  public function addUsers($users) {
+  public function addUsers(array $users) {
     foreach ($users as $user) {
       $this->addUser($user);
     }
@@ -348,7 +350,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @return array
    *   An associative array defining a tableselect element.
    */
-  protected function getTable($pids) {
+  protected function getTable(array $pids) {
     return array(
       '#type' => 'tableselect',
       '#header' => $this->getTableHeader(),
@@ -419,7 +421,7 @@ abstract class Bookmark implements BookmarkInterface {
         );
         drupal_add_html_head($citation_export_head, 'citation_exporter_head');
       }
-      //Needed here, citation adds an empty _SESSION key by default
+      // Needed here, citation adds an empty _SESSION key by default.
       unset($_SESSION[CITATION_EXPORTER_INDEX_SESSION]);
     }
 
@@ -463,8 +465,8 @@ abstract class Bookmark implements BookmarkInterface {
     $form['bookmarks']['fieldset'] += array(
       'table' => $table += array(
         '#empty' => t('@type list is empty.', array(
-      '@type' => ucwords(variable_get('islandora_bookmark_type', 'bookmark')),
-    )),
+          '@type' => ucwords(variable_get('islandora_bookmark_type', 'bookmark')),
+        )),
         '#weight' => -2,
       ),
       'pager' => array(
@@ -493,7 +495,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @param array $form_state
    *   The Drupal form state.
    */
-  protected function formAddActions(&$container, &$form_state) {
+  protected function formAddActions(array &$container, array &$form_state) {
     $groups = array();
 
     if ($this->managementAccess()) {
@@ -653,8 +655,7 @@ abstract class Bookmark implements BookmarkInterface {
             drupal_set_message(t('The user @username has been removed from the list @listname.', array(
               '@listname' => $this->bookmarkName,
               '@username' => $output_user,
-                    )
-            ));
+            )));
             $this->removeUsers(array($remove_user));
           }
         }
@@ -673,7 +674,9 @@ abstract class Bookmark implements BookmarkInterface {
           }
           else {
             $fku['title'] = array(
-              '#markup' => '<h3>' . t('Shared with') . ':</h3>',
+              '#prefix' => '<h3>',
+              '#suffix' => '</h3>',
+              '#markup' => t('Shared with:'),
             );
             // Remove the user from the populated shared users.
             $bookmark_users = $this->getUsers();
@@ -735,11 +738,11 @@ abstract class Bookmark implements BookmarkInterface {
           }
           // Get all users for use in select for forms.
           $result = db_select('users', 'u')
-              ->fields('u', array('uid', 'name'))
-              ->condition('STATUS', 0, '!=')
-              ->condition('uid', $user->uid, '!=')
-              ->orderBy('uid')
-              ->execute();
+            ->fields('u', array('uid', 'name'))
+            ->condition('STATUS', 0, '!=')
+            ->condition('uid', $user->uid, '!=')
+            ->orderBy('uid')
+            ->execute();
 
           $options += $result->fetchAllAssoc('uid', PDO::FETCH_ASSOC);
           if (isset($options['0'])) {
@@ -905,7 +908,7 @@ abstract class Bookmark implements BookmarkInterface {
    * @return array
    *   An array of PIDs--may be empty if there are none present.
    */
-  protected function formGetPidToRemove($form_state) {
+  protected function formGetPidToRemove(array $form_state) {
     $to_remove = preg_grep('/remove_pid_.*/', array_keys($form_state['input']));
     return preg_replace('/remove_pid_(.*)/', '$1', $to_remove);
   }
@@ -962,7 +965,7 @@ abstract class Bookmark implements BookmarkInterface {
     if (!empty($broken)) {
       watchdog('islandora_bookmark', 'Broken PIDs encountered: @pids', array(
         '@pids' => implode(', ', $broken),
-          ), WATCHDOG_WARNING);
+      ), WATCHDOG_WARNING);
     }
 
     return $functional;
@@ -978,7 +981,7 @@ abstract class Bookmark implements BookmarkInterface {
     if (!empty($broken)) {
       watchdog('islandora_bookmark', 'Broken PIDs encountered: @pids', array(
         '@pids' => implode(', ', $broken),
-          ), WATCHDOG_WARNING);
+      ), WATCHDOG_WARNING);
     }
 
     return $functional;
