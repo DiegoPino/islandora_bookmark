@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Houses helper functions used in the islandora_bookmark module
+ * Houses helper functions used in the islandora_bookmark module.
  */
 
 /**
  * Retrieves lists that the specified user has access to.
  *
- * @global stdClass $user
- *
- * @param string|NULL $type
+ * @param string|null $type
  *   Optional type of bookmark to retrieve. Defaults to all bookmarks.
+ *
+ * @global stdClass $user
  *
  * @return array
  *   An array of PidList objects.
@@ -47,10 +47,10 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
         $bookmark_list[] = BookmarkSession::getList($id);
       }
       if (count($_SESSION['islandora_bookmark']) == 1) {
-         $list = reset($_SESSION['islandora_bookmark']);
-         if ($list->getPidCount() == 0) {
-           unset($_SESSION['islandora_bookmark']);
-         }
+        $list = reset($_SESSION['islandora_bookmark']);
+        if ($list->getPidCount() == 0) {
+          unset($_SESSION['islandora_bookmark']);
+        }
       }
     }
   }
@@ -61,6 +61,7 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
  * Retrieves all Bookmarks the current user is shared on.
  *
  * @global stdClass $user
+ *
  * @return array
  *   An array of Bookmarks.
  */
@@ -93,10 +94,10 @@ function islandora_bookmark_get_user_shared_bookmarks() {
 /**
  * Retrieves a Bookmark given a specified ID.
  *
- * @global stdClass $user
- *
  * @param int $listid
  *   List ID to be searched for.
+ *
+ * @global stdClass $user
  *
  * @return bool|Bookmark
  *   PidList object or FALSE if the list does not exist.
@@ -123,7 +124,7 @@ function islandora_bookmark_get_bookmark_by_number($listid) {
 function islandora_bookmark_get_bookmarks_visible_to_user($pid, $uid) {
   $lists = array();
   if ($uid == 0) {
-   if (isset($_SESSION['islandora_bookmark'])) {
+    if (isset($_SESSION['islandora_bookmark'])) {
       foreach ($_SESSION['islandora_bookmark'] as $value) {
         $templist = $value;
         if (in_array($pid, $templist->getPids())) {
