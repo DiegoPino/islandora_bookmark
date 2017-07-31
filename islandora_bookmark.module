@@ -765,7 +765,7 @@ function islandora_bookmark_fedora_repository_object_form(array $form, array &$f
     // @see https://www.drupal.org/docs/7/api/localization-api/dynamic-or-static-links-and-html-in-translatable-strings.
     $form['islandora_bookmark']['lists'] = array(
       '#type' => 'item',
-      '#prefix' => t('<h3>Bookmarked in:</h3'),
+      '#prefix' => t('<h3>Bookmarked in:</h3>'),
       '#items' => $links,
       '#theme' => 'item_list',
     );
