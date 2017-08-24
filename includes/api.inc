@@ -39,7 +39,8 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
   dpm($_SESSION);
   // User is anon, deal with sessions.
   if ($user->uid == 0) {
-    if (!isset($_SESSION) || !isset($_SESSION['islandora_bookmark']) || empty($_SESSION['islandora_bookmark']) && variable_get('islandora_bookmark_create_user_default_lists', FALSE)) {
+    if ((!isset($_SESSION) || !isset($_SESSION['islandora_bookmark']) || empty($_SESSION['islandora_bookmark'])) && variable_get('islandora_bookmark_create_user_default_lists', FALSE)) {
+      dpm('creating fake default session');
       $bookmark_list[] = BookmarkDefaultSessionList::createNewList(t('My Default List'), $user, 'Default bookmark');
     }
 
@@ -50,6 +51,7 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
       if (count($_SESSION['islandora_bookmark']) == 1) {
         $list = reset($_SESSION['islandora_bookmark']);
         if ($list->getPidCount() == 0) {
+          dpm('deleting fake sessions because they are empty');
           unset($_SESSION['islandora_bookmark']);
         }
       }
