@@ -48,13 +48,13 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
       foreach (array_keys($_SESSION['islandora_bookmark']) as $id) {
         $bookmark_list[] = BookmarkSession::getList($id);
       }
-      if (count($_SESSION['islandora_bookmark']) == 1) {
+      /*if (count($_SESSION['islandora_bookmark']) == 1) {
         $list = reset($_SESSION['islandora_bookmark']);
         if ($list->getPidCount() == 0) {
           dpm('deleting fake sessions because they are empty');
           unset($_SESSION['islandora_bookmark']);
         }
-      }
+      }*/
     }
   }
   return $bookmark_list;
