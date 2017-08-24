@@ -35,7 +35,8 @@ function islandora_bookmark_get_user_owned_bookmarks($type = NULL) {
 
     $bookmark_list[] = $templist;
   }
-
+  dpm(variable_get('islandora_bookmark_create_user_default_lists', FALSE));
+  dpm($_SESSION);
   // User is anon, deal with sessions.
   if ($user->uid == 0) {
     if (!isset($_SESSION) || !isset($_SESSION['islandora_bookmark']) || empty($_SESSION['islandora_bookmark']) && variable_get('islandora_bookmark_create_user_default_lists', FALSE)) {
